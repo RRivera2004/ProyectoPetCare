@@ -1,12 +1,6 @@
 
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import {View, Text,StyleSheet,ScrollView,TouchableOpacity,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Deworming({ navigation }: any) {
