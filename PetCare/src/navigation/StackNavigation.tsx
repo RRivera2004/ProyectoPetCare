@@ -1,16 +1,16 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-import Login from "../screens/Login";
-import Register from "../screens/Register";
-
-
-import Vaccines from "../screens/features/Vaccines";
-import Deworming from "../screens/features/Deworming";
-import Reminders from "../screens/features/Reminders";
-import VeterinaryHistory from "../screens/features/VeterinaryHistory";
+import { RootStackParamList } from "../type/navigation";
+import Login from "../screen/Login";
+import Register from "../screen/Register";
 import TabsNavigator from "./TabsNavigation";
-import { RootStackParamList } from "../src/type/navigation";
+import Vaccines from "../screen/features/Vaccines";
+import Deworming from "../screen/features/Dewarning";
+import Reminders from "../screen/features/Reminders";
+import VeterinaryHistory from "../screen/features/VeterinaryHistory";
+
+
+
 
 
 

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import {View,Text,StyleSheet,KeyboardAvoidingView,Platform, ScrollView,TouchableOpacity,
-} from "react-native";
+import {View, Text,StyleSheet,KeyboardAvoidingView,Platform,ScrollView,TouchableOpacity, ActivityIndicator,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import CustomInput from "../src/components/CustomInput";
-import CustomButton from "../src/components/CustomButton";
-import { RootStackParamList } from "../src/type/navigation";
+import { RootStackParamList } from "../type/navigation";
+import CustomInput from "../components/CustomInput";
+import CustomButton from "../components/CustomButton";
+import { UseAuth } from "../contexts/AuthContext";
+
 
 
 type Props = NativeStackScreenProps<
@@ -14,143 +15,58 @@ type Props = NativeStackScreenProps<
 >;
 
 export default function Register({ navigation }: Props) {
+  const { register } = UseAuth(); 
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [nameError, setNameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] =
-    useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const validateEmail = (value: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  };
 
-  const validatePhone = (value: string) => {
-    return /^[0-9]{8}$/.test(value);
-  };
 
-  const handleRegister = () => {
-    let valid = true;
-
-    setNameError("");
-    setEmailError("");
-    setPhoneError("");
-    setPasswordError("");
-    setConfirmPasswordError("");
-
-  
-    if (!name.trim()) {
-      setNameError("El nombre es obligatorio.");
-      valid = false;
+ const handleRegister = async () => {
+    try {
+      await register(email, password);
+      navigation.navigate("LoginScreen");
+    } catch (error: any) {
+      console.log("error al registrarse: ", error.message);
     }
-
-   
-    if (!email.trim()) {
-      setEmailError("El correo electrónico es obligatorio.");
-      valid = false;
-    } else if (!validateEmail(email)) {
-      setEmailError("Ingresa un correo electrónico válido.");
-      valid = false;
-    }
-
-    
-    if (!phone.trim()) {
-      setPhoneError("El teléfono es obligatorio.");
-      valid = false;
-    } else if (!validatePhone(phone)) {
-      setPhoneError(
-        "El teléfono debe contener 8 números."
-      );
-      valid = false;
-    }
-
-  
-    if (!password.trim()) {
-      setPasswordError("La contraseña es obligatoria.");
-      valid = false;
-    } else if (password.length < 6) {
-      setPasswordError(
-        "La contraseña debe tener al menos 6 caracteres."
-      );
-      valid = false;
-    }
-
-   
-    if (!confirmPassword.trim()) {
-      setConfirmPasswordError(
-        "Debes confirmar la contraseña."
-      );
-      valid = false;
-    } else if (confirmPassword !== password) {
-      setConfirmPasswordError(
-        "Las contraseñas no coinciden."
-      );
-      valid = false;
-    }
-
-    if (!valid) {
-      return;
-    }
-
-    
-    navigation.replace("LoginScreen");
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={
-        Platform.OS === "ios" ? "padding" : undefined
-      }
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Encabezado */}
+        
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color="#1F2937"
-            />
+            <Ionicons name="arrow-back" size={24} color="#1F2937" />
           </TouchableOpacity>
 
           <View style={styles.logoContainer}>
-            <Ionicons
-              name="paw"
-              size={38}
-              color="#FFFFFF"
-            />
+            <Ionicons name="paw" size={38} color="#FFFFFF" />
           </View>
 
           <Text style={styles.title}>Crear cuenta</Text>
 
           <Text style={styles.subtitle}>
-            Únete a PetCare y comienza a cuidar mejor a tu
-            mascota.
+            Únete a PetCare y comienza a cuidar mejor a tu mascota.
           </Text>
         </View>
 
-        {/* Formulario */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>
-            Información personal
-          </Text>
+          <Text style={styles.sectionTitle}>Información personal</Text>
 
           <CustomInput
             label="Nombre completo"
@@ -158,7 +74,7 @@ export default function Register({ navigation }: Props) {
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
-            error={nameError}
+            
           />
 
           <CustomInput
@@ -169,7 +85,7 @@ export default function Register({ navigation }: Props) {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
-            error={emailError}
+           
           />
 
           <CustomInput
@@ -179,12 +95,10 @@ export default function Register({ navigation }: Props) {
             onChangeText={setPhone}
             keyboardType="phone-pad"
             maxLength={8}
-            error={phoneError}
+    
           />
 
-          <Text style={styles.sectionTitle}>
-            Seguridad
-          </Text>
+          <Text style={styles.sectionTitle}>Seguridad</Text>
 
           <View>
             <CustomInput
@@ -194,28 +108,22 @@ export default function Register({ navigation }: Props) {
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
-              error={passwordError}
+           
             />
 
             <TouchableOpacity
               style={styles.eyeButton}
-              onPress={() =>
-                setShowPassword(!showPassword)
-              }
+              onPress={() => setShowPassword(!showPassword)}
             >
               <Ionicons
-                name={
-                  showPassword
-                    ? "eye-off-outline"
-                    : "eye-outline"
-                }
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
                 size={22}
                 color="#6B7280"
               />
             </TouchableOpacity>
           </View>
 
-          <View>
+          <View style={styles.inputContainer}>
             <CustomInput
               label="Confirmar contraseña"
               placeholder="Repite tu contraseña"
@@ -223,48 +131,37 @@ export default function Register({ navigation }: Props) {
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
               autoCapitalize="none"
-              error={confirmPasswordError}
+              
             />
 
             <TouchableOpacity
               style={styles.eyeButton}
-              onPress={() =>
-                setShowConfirmPassword(
-                  !showConfirmPassword
-                )
-              }
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               <Ionicons
-                name={
-                  showConfirmPassword
-                    ? "eye-off-outline"
-                    : "eye-outline"
-                }
+                name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
                 size={22}
                 color="#6B7280"
               />
             </TouchableOpacity>
           </View>
-
-          <CustomButton
-            title="Crear mi cuenta"
-            onPress={handleRegister}
+          
+         
+          <CustomButton 
+          title={"Registrarme"} 
+          onPress={handleRegister} 
           />
-
+          
           <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>
-              ¿Ya tienes una cuenta?
-            </Text>
+            <Text style={styles.loginText}>¿Ya tienes una cuenta?</Text>
 
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("LoginScreen")
-              }
-            >
-              <Text style={styles.loginLink}>
-                Iniciar sesión
-              </Text>
-            </TouchableOpacity>
+            <CustomButton
+           title="Ya tengo cuenta"
+           onPress={() => navigation.navigate("LoginScreen")}
+           variant="secondary"
+           />
+              <Text style={styles.loginLink}>Iniciar sesión</Text>
+            
           </View>
         </View>
 
@@ -281,17 +178,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F9FC",
   },
-
   scroll: {
     flexGrow: 1,
     padding: 20,
   },
-
   header: {
     alignItems: "center",
     marginBottom: 20,
   },
-
   backButton: {
     alignSelf: "flex-start",
     width: 42,
@@ -302,7 +196,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-
   logoContainer: {
     width: 68,
     height: 68,
@@ -312,13 +205,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-
   title: {
     fontSize: 30,
     fontWeight: "800",
     color: "#1F2937",
   },
-
   subtitle: {
     fontSize: 14,
     color: "#6B7280",
@@ -326,7 +217,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 5,
   },
-
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 22,
@@ -335,12 +225,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: {
-      width: 0,
+     width: 0,
       height: 5,
     },
     elevation: 4,
   },
-
   sectionTitle: {
     fontSize: 17,
     fontWeight: "800",
@@ -348,32 +237,30 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginTop: 5,
   },
-
+  inputContainer: {
+    position: "relative",
+  },
   eyeButton: {
     position: "absolute",
     right: 15,
-    bottom: 29,
+    bottom: 25,
   },
-
   loginContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
   },
-
   loginText: {
     color: "#6B7280",
     fontSize: 14,
   },
-
   loginLink: {
     color: "#2E7D6B",
     fontSize: 14,
     fontWeight: "700",
     marginLeft: 5,
   },
-
   footer: {
     textAlign: "center",
     color: "#9CA3AF",

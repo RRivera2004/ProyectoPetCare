@@ -1,69 +1,37 @@
-import React, { useState } from "react";
-import {View,Text,StyleSheet,KeyboardAvoidingView,Platform, ScrollView,TouchableOpacity,} from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useState } from "react";
+import { RootStackParamList } from "../type/navigation";
+import { KeyboardAvoidingView,Platform, ScrollView,StyleSheet,Text,TouchableOpacity,View,Alert,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { RootStackParamList } from "../src/type/navigation";
-import CustomInput from "../src/components/CustomInput";
-import CustomButton from "../src/components/CustomButton";
+import CustomInput from "../components/CustomInput";
+import CustomButton from "../components/CustomButton";
+import { UseAuth } from "../contexts/AuthContext";
 
-
-
-type Props = NativeStackScreenProps<
-  RootStackParamList,
-  "LoginScreen"
->;
+type Props = NativeStackScreenProps<RootStackParamList, "LoginScreen">;
 
 export default function Login({ navigation }: Props) {
+  const { login } = UseAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
 
-  const validateEmail = (value: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  };
 
-  const handleLogin = () => {
-    let valid = true;
-
-    setEmailError("");
-    setPasswordError("");
-
-    if (!email.trim()) {
-      setEmailError("El correo electrónico es obligatorio.");
-      valid = false;
-    } else if (!validateEmail(email)) {
-      setEmailError("Ingresa un correo electrónico válido.");
-      valid = false;
+  const handleLogin = async () => {
+  
+    try {
+      await login(email, password);
+      navigation.navigate("UserTabs", {screen: "HomeTab",params: { email },
+      });
+    } catch (error: any) {
+      console.log("usuario no tiene acceso", error);
+   
     }
-
-    if (!password.trim()) {
-      setPasswordError("La contraseña es obligatoria.");
-      valid = false;
-    } else if (password.length < 6) {
-      setPasswordError(
-        "La contraseña debe tener al menos 6 caracteres."
-      );
-      valid = false;
-    }
-
-    if (!valid) {
-      return;
-    }
-
-    
-    navigation.replace("UserTabs");
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={
-        Platform.OS === "ios" ? "padding" : undefined
-      }
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -71,11 +39,7 @@ export default function Login({ navigation }: Props) {
       >
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Ionicons
-              name="paw"
-              size={42}
-              color="#FFFFFF"
-            />
+            <Ionicons name="paw" size={42} color="#FFFFFF" />
           </View>
 
           <Text style={styles.title}>PetCare</Text>
@@ -86,13 +50,10 @@ export default function Login({ navigation }: Props) {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.welcome}>
-            ¡Bienvenido!
-          </Text>
+          <Text style={styles.welcome}>¡Bienvenido!</Text>
 
           <Text style={styles.description}>
-            Inicia sesión para administrar el cuidado de
-            tu mascota.
+            Inicia sesión para administrar el cuidado de tu mascota.
           </Text>
 
           <CustomInput
@@ -103,7 +64,6 @@ export default function Login({ navigation }: Props) {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
-            error={emailError}
           />
 
           <View>
@@ -114,39 +74,28 @@ export default function Login({ navigation }: Props) {
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
-              error={passwordError}
             />
 
             <TouchableOpacity
               style={styles.eyeButton}
-              onPress={() =>
-                setShowPassword(!showPassword)
-              }
+              onPress={() => setShowPassword(!showPassword)}
             >
               <Ionicons
-                name={
-                  showPassword
-                    ? "eye-off-outline"
-                    : "eye-outline"
-                }
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
                 size={22}
                 color="#6B7280"
               />
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.forgot}
-            onPress={() => {}}
-          >
-            <Text style={styles.forgotText}>
-              ¿Olvidaste tu contraseña?
-            </Text>
+          <TouchableOpacity style={styles.forgot} onPress={() => {}}>
+            <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
 
           <CustomButton
-            title="Iniciar sesión"
+            title={ "Iniciar sesión"}
             onPress={handleLogin}
+        
           />
 
           <View style={styles.dividerContainer}>
@@ -156,11 +105,10 @@ export default function Login({ navigation }: Props) {
           </View>
 
           <CustomButton
-            title="Crear una cuenta"
+            title="Registrarme"
             variant="secondary"
-            onPress={() =>
-              navigation.navigate("RegisterScreen")
-            }
+            onPress={() => navigation.navigate("RegisterScreen")}
+          
           />
         </View>
 
@@ -177,18 +125,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F9FC",
   },
-
   scroll: {
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
   },
-
   header: {
     alignItems: "center",
     marginBottom: 25,
   },
-
   logoContainer: {
     width: 78,
     height: 78,
@@ -198,20 +143,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-
   title: {
     fontSize: 34,
     fontWeight: "800",
     color: "#1F2937",
   },
-
   subtitle: {
     fontSize: 15,
     color: "#6B7280",
     textAlign: "center",
     marginTop: 5,
   },
-
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 22,
@@ -225,13 +167,11 @@ const styles = StyleSheet.create({
     },
     elevation: 4,
   },
-
   welcome: {
     fontSize: 25,
     fontWeight: "800",
     color: "#1F2937",
   },
-
   description: {
     fontSize: 14,
     color: "#6B7280",
@@ -239,43 +179,36 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 22,
   },
-
   eyeButton: {
     position: "absolute",
     right: 15,
     bottom: 29,
   },
-
   forgot: {
     alignSelf: "flex-end",
     marginTop: -5,
     marginBottom: 10,
   },
-
   forgotText: {
     color: "#2E7D6B",
     fontSize: 14,
     fontWeight: "600",
   },
-
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 18,
   },
-
   divider: {
     flex: 1,
     height: 1,
     backgroundColor: "#E5E7EB",
   },
-
   orText: {
     marginHorizontal: 12,
     color: "#9CA3AF",
     fontSize: 14,
   },
-
   footer: {
     textAlign: "center",
     color: "#9CA3AF",

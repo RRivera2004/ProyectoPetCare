@@ -1,6 +1,7 @@
 import React from "react";
-import {StyleSheet,View,Text,ScrollView,TouchableOpacity,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
 
 export default function Home({ navigation }: any) {
   return (

@@ -1,15 +1,15 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { TabsParamList } from "../type/navigation";
+import Home from "../screen/Home";
+import Profile from "../screen/features/Profile";
+import Settings from "../screen/features/Settings";
 
-import Home from "../screens/Home";
-import Profile from "../screens/features/Profile";
-import Settings from "../screens/features/Settings";
-import { TabsParamList } from "../src/type/navigation";
 
 
-const Tab =
-  createBottomTabNavigator<TabsParamList>();
+
+const Tab = createBottomTabNavigator<TabsParamList>();
 
 export default function TabsNavigator() {
   return (
