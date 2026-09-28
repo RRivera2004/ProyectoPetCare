@@ -1,36 +1,58 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
+import React, { useState } from "react";
 import { RootStackParamList } from "../type/navigation";
-import { KeyboardAvoidingView,Platform, ScrollView,StyleSheet,Text,TouchableOpacity,View,Alert,} from "react-native";
+import {KeyboardAvoidingView,Platform, ScrollView,StyleSheet,Text,TouchableOpacity,View,Alert} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { UseAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "LoginScreen">;
 
 export default function Login({ navigation }: Props) {
-  const { login } = UseAuth();
+  const { login, loginGuest } = UseAuth();
+  const { colors } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-  
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Campos requeridos", "Por favor ingresa tu correo y contraseña.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await login(email, password);
-      navigation.navigate("UserTabs", {screen: "HomeTab",params: { email },
+      await login(email.trim(), password);
+      navigation.navigate("UserTabs", {
+        screen: "HomeTab",
+        params: { email: email.trim() },
       });
     } catch (error: any) {
-      console.log("usuario no tiene acceso", error);
-   
+      console.log("Error de login:", error);
+      Alert.alert(
+        "Error al iniciar sesión",
+        error.message || "Credenciales incorrectas o usuario no registrado."
+      );
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleGuestLogin = () => {
+    loginGuest();
+    navigation.navigate("UserTabs", {
+      screen: "HomeTab",
+      params: { email: "invitado@petcare.com" },
+    });
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -42,17 +64,27 @@ export default function Login({ navigation }: Props) {
             <Ionicons name="paw" size={42} color="#FFFFFF" />
           </View>
 
-          <Text style={styles.title}>PetCare</Text>
+          <Text style={[styles.title, { color: colors.text }]}>PetCare</Text>
 
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             El mejor cuidado para tu mejor amigo 🐾
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.welcome}>¡Bienvenido!</Text>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Text style={[styles.welcome, { color: colors.text }]}>
+            ¡Bienvenido!
+          </Text>
 
-          <Text style={styles.description}>
+          <Text style={[styles.description, { color: colors.textSecondary }]}>
             Inicia sesión para administrar el cuidado de tu mascota.
           </Text>
 
@@ -63,7 +95,6 @@ export default function Login({ navigation }: Props) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            autoCorrect={false}
           />
 
           <View>
@@ -83,36 +114,53 @@ export default function Login({ navigation }: Props) {
               <Ionicons
                 name={showPassword ? "eye-off-outline" : "eye-outline"}
                 size={22}
-                color="#6B7280"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.forgot} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.forgot}
+            onPress={() =>
+              Alert.alert(
+                "Recuperación",
+                "Puedes ingresar directamente en el modo invitado o registrar una cuenta nueva."
+              )
+            }
+          >
             <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
 
           <CustomButton
-            title={ "Iniciar sesión"}
+            title="Iniciar sesión"
             onPress={handleLogin}
-        
+            loading={loading}
           />
 
           <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.orText}>o</Text>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <Text style={[styles.orText, { color: colors.textSecondary }]}>
+              o
+            </Text>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
           </View>
 
           <CustomButton
             title="Registrarme"
             variant="secondary"
             onPress={() => navigation.navigate("RegisterScreen")}
-          
           />
+
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={handleGuestLogin}
+          >
+            <Ionicons name="sparkles-outline" size={18} color="#2E7D6B" />
+            <Text style={styles.guestText}>Ingresar en Modo Demostración</Text>
+          </TouchableOpacity>
         </View>
 
-        <Text style={styles.footer}>
+        <Text style={[styles.footer, { color: colors.textSecondary }]}>
           🐾 Cuida, recuerda y disfruta cada momento.
         </Text>
       </ScrollView>
@@ -208,6 +256,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     color: "#9CA3AF",
     fontSize: 14,
+  },
+  guestButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 14,
+    paddingVertical: 10,
+  },
+  guestText: {
+    color: "#2E7D6B",
+    fontSize: 14,
+    fontWeight: "700",
+    marginLeft: 6,
   },
   footer: {
     textAlign: "center",

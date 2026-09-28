@@ -6,13 +6,10 @@ export type TabsParamList = {
   Settings: undefined;
 };
 
-
-
 export type RootStackParamList = {
   LoginScreen: undefined;
   RegisterScreen: undefined;
   UserTabs: NavigatorScreenParams<TabsParamList>;
-
   Vaccines: undefined;
   Deworming: undefined;
   Reminders: undefined;

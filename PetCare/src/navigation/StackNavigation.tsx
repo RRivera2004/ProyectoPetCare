@@ -11,11 +11,7 @@ import VeterinaryHistory from "../screen/features/VeterinaryHistory";
 
 
 
-
-
-
-const Stack =
-  createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (

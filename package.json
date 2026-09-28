@@ -1,0 +1,10 @@
+{
+  "name": "proyectopetcare",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm start --prefix PetCare",
+    "android": "npm run android --prefix PetCare",
+    "ios": "npm run ios --prefix PetCare"
+  }
+}

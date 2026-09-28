@@ -5,21 +5,20 @@ import { TabsParamList } from "../type/navigation";
 import Home from "../screen/Home";
 import Profile from "../screen/features/Profile";
 import Settings from "../screen/features/Settings";
-
-
-
+import { useTheme } from "../contexts/ThemeContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Tab = createBottomTabNavigator<TabsParamList>();
 
 export default function TabsNavigator() {
+  
+  const{colors, isDark} = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-
         tabBarActiveTintColor: "#2E7D6B",
         tabBarInactiveTintColor: "#9CA3AF",
-
         tabBarStyle: {
           height: 65,
           paddingBottom: 8,

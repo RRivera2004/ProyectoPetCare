@@ -6,14 +6,10 @@ type CustomButtonProps = {
   onPress: () => void;
   variant?: "primary" | "secondary";
   style?: ViewStyle;
+  loading?: boolean;
 };
 
-export default function CustomButton({
-  title,
-  onPress,
-  variant = "primary",
-  style,
-}: CustomButtonProps) {
+export default function CustomButton({title,onPress,variant = "primary",style,}: CustomButtonProps) {
   return (
     <TouchableOpacity
       style={[
